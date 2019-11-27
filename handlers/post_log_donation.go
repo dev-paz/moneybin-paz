@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/moneybin/moneybin-paz/dto"
+	"github.com/moneybin/moneybin-paz/models"
 	stripe "github.com/stripe/stripe-go"
-	"pkg/mod/github.com/moneybin/moneybin-paz/dto"
-	"pkg/mod/github.com/moneybin/moneybin-paz/models"
 )
 
 // Set your secret key: remember to change this to your live secret key in production

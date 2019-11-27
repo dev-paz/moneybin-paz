@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	stripe "github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/paymentintent"
-	stripe "pkg/mod/github.com/stripe/stripe-go"
 )
 
 func handleGetPaymentIntent(w http.ResponseWriter, req *http.Request) {
