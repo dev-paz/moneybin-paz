@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	_ "github.com/lib/pq"
-	handler "github.com/moneybin/moneybin-paz/handlers"
-	"github.com/moneybin/moneybin-paz/models"
+	handler "pkg/mod/github.com/moneybin/moneybin-paz/handlers"
+	"pkg/mod/github.com/moneybin/moneybin-paz/models"
 )
 
 const (

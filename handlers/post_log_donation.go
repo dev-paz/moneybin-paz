@@ -8,12 +8,16 @@ import (
 	"os"
 
 	stripe "github.com/stripe/stripe-go"
+	"pkg/mod/github.com/moneybin/moneybin-paz/dto"
+	"pkg/mod/github.com/moneybin/moneybin-paz/models"
 )
 
 // Set your secret key: remember to change this to your live secret key in production
 // See your keys here: https://dashboard.stripe.com/account/apikeys
 
 func HandleLogDonation(w http.ResponseWriter, req *http.Request) {
+
+	donation := dto.Donation{}
 
 	stripe.Key = "sk_test_6vNXUZ4qN5uaV4R6LEOUnExS00WkSadUs7"
 
@@ -37,6 +41,8 @@ func HandleLogDonation(w http.ResponseWriter, req *http.Request) {
 	// Unmarshal the event data into an appropriate struct depending on its Type
 	switch event.Type {
 	case "payment_intent.succeeded":
+		fmt.Println("PaymentIntent was successful!")
+
 		var paymentIntent stripe.PaymentIntent
 		err := json.Unmarshal(event.Data.Raw, &paymentIntent)
 		if err != nil {
@@ -44,7 +50,20 @@ func HandleLogDonation(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+
+		donation.Amount = paymentIntent.Amount
+		donation.ID = paymentIntent.ID
+		donation.DonationCreatedTimestamp = "2019-10-11"
+		donation.UserId = "test_user"
+		donation.UserName = "Jordan Mattews"
+
+		err = models.CreateDonation(&donation)
+		if err != nil {
+			panic(err)
+		}
+
 		fmt.Println("PaymentIntent was successful!")
+
 	case "payment_method.attached":
 		var paymentMethod stripe.PaymentMethod
 		err := json.Unmarshal(event.Data.Raw, &paymentMethod)
@@ -54,12 +73,13 @@ func HandleLogDonation(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		fmt.Println("PaymentMethod was attached to a Customer!")
-	// ... handle other event types
+
 	default:
 		fmt.Fprintf(os.Stderr, "Unexpected event type: %s\n", event.Type)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }

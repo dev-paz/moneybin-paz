@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	dto "github.com/moneybin/moneybin-paz/dto"
+	dto "pkg/mod/github.com/moneybin/moneybin-paz/dto"
 
 	_ "github.com/lib/pq"
 )

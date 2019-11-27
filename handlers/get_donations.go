@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/moneybin/moneybin-paz/models"
+	"pkg/mod/github.com/moneybin/moneybin-paz/models"
 )
 
 func handleGETDonations(w http.ResponseWriter, req *http.Request) {

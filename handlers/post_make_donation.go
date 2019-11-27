@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/moneybin/moneybin-paz/dto"
-	"github.com/moneybin/moneybin-paz/models"
+	"pkg/mod/github.com/moneybin/moneybin-paz/dto"
+	"pkg/mod/github.com/moneybin/moneybin-paz/models"
 )
 
 func handlePOSTMakeDonation(w http.ResponseWriter, req *http.Request) {
