@@ -1,0 +1,8 @@
+package: github.com/moneybin/moneybin-paz
+import:
+- package: github.com/lib/pq
+  version: v1.2.0
+- package: github.com/stripe/stripe-go
+  version: v67.9.0
+  subpackages:
+  - paymentintent
