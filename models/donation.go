@@ -11,15 +11,18 @@ import (
 func ReadDonations() (*[]dto.Donation, error) {
 	var d dto.Donation
 	var donations []dto.Donation
-	rows, err := db.Query(`SELECT donation_id, user_name, user_id, amount FROM donations`)
+	rows, err := db.Query(`SELECT donation_id, user_name, user_id, amount, donation_created_timestamp FROM donations`)
 	if err != nil {
 		fmt.Println("error querying")
 	}
 	for rows.Next() {
-		rows.Scan(&d.ID, &d.UserName, &d.UserId, &d.Amount, &d.DonationCreatedTimestamp)
+		err = rows.Scan(&d.ID, &d.UserName, &d.UserId, &d.Amount, &d.DonationCreatedTimestamp)
+		if err != nil {
+			// handle this error
+			panic(err)
+		}
 		donations = append(donations, d)
 	}
-	fmt.Println(donations)
 	return &donations, nil
 }
 
