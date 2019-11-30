@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 	handler "github.com/moneybin/moneybin-paz/handlers"
@@ -10,9 +11,10 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PORT")
 
 	models.InitDB()
 
 	handler.HandleRequests()
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
