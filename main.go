@@ -14,5 +14,5 @@ func main() {
 	models.InitDB()
 
 	handler.HandleRequests()
-	log.Fatal(http.ListenAndServe(":8881", nil))
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
