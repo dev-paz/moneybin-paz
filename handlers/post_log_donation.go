@@ -16,7 +16,7 @@ import (
 // See your keys here: https://dashboard.stripe.com/account/apikeys
 
 func HandleLogDonation(w http.ResponseWriter, req *http.Request) {
-
+	fmt.Println("made it here!!!!")
 	donation := dto.Donation{}
 
 	stripe.Key = "sk_test_6vNXUZ4qN5uaV4R6LEOUnExS00WkSadUs7"
