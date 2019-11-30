@@ -10,6 +10,7 @@ import (
 	"github.com/moneybin/moneybin-paz/dto"
 	"github.com/moneybin/moneybin-paz/models"
 	stripe "github.com/stripe/stripe-go"
+	"github.com/stripe/stripe-go/webhook"
 )
 
 // Set your secret key: remember to change this to your live secret key in production
@@ -30,7 +31,21 @@ func HandleLogDonation(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	event := stripe.Event{}
+	// If you are testing your webhook locally with the Stripe CLI you
+	// can find the endpoint's secret by running `stripe listen`
+	// Otherwise, find your endpoint's secret in your webhook settings in the Developer Dashboard
+	endpointSecret := "whsec_21ogFEfqUs7XFgnEziI54AdbU14YIko8"
+
+	// Pass the request body and Stripe-Signature header to ConstructEvent, along
+	// with the webhook signing key.
+	event, err := webhook.ConstructEvent(payload, req.Header.Get("Stripe-Signature"),
+		endpointSecret)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error verifying webhook signature: %v\n", err)
+		w.WriteHeader(http.StatusBadRequest) // Return a 400 error on a bad signature
+		return
+	}
 
 	if err := json.Unmarshal(payload, &event); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to parse webhook body json: %v\n", err.Error())
