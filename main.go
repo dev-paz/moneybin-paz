@@ -13,8 +13,8 @@ import (
 const (
 	host     = "localhost"
 	port     = 5432
-	user     = "paz"
-	password = "password"
+	user     = "qpivtmamwliml"
+	password = "a3184750c3ee8bb244ecb21efba4a5ecbc0dc442df9f251f657012ead1041aa2"
 	dbname   = "moneybin"
 )
 
