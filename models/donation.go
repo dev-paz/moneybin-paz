@@ -19,6 +19,7 @@ func ReadDonations() (*[]dto.Donation, error) {
 		rows.Scan(&d.ID, &d.UserName, &d.UserId, &d.Amount, &d.DonationCreatedTimestamp)
 		donations = append(donations, d)
 	}
+	fmt.Println(donations)
 	return &donations, nil
 }
 
