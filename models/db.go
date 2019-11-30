@@ -10,7 +10,7 @@ import (
 
 var db *sql.DB
 
-func InitDB(psqlInfo string) {
+func InitDB() {
 	var err error
 	db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
