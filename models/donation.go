@@ -11,7 +11,7 @@ import (
 func ReadDonations() (*[]dto.Donation, error) {
 	var d dto.Donation
 	var donations []dto.Donation
-	rows, err := db.Query(`SELECT donationid, username, userid, amount FROM donations`)
+	rows, err := db.Query(`SELECT id, username, userid, amount FROM donations`)
 	if err != nil {
 		fmt.Println("error querying")
 	}
