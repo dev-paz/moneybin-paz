@@ -3,16 +3,15 @@ package models
 import (
 	"database/sql"
 	"log"
-	"os"
 
 	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
-func InitDB() {
+func InitDB(psqlInfo string) {
 	var err error
-	db, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Panic(err)
 	}
