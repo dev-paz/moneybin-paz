@@ -9,7 +9,7 @@ import (
 )
 
 func ReadUsers() (*[]dto.User, error) {
-
+	//
 	var u dto.User
 	var users []dto.User
 	rows, err := db.Query(`SELECT user_id, user_name, email , last_signed_in, signup_timestamp FROM users`)
