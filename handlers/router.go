@@ -9,5 +9,5 @@ func HandleRequests() {
 	http.Handle("/donate", Authorised(handlePOSTMakeDonation))
 	http.Handle("/payment_intent", Authorised(handleGetPaymentIntent))
 	http.Handle("/log_donation", Authorised(HandleLogDonation))
-	http.HandleFunc("/create_user", handleCreateUser)
+	http.HandleFunc("/google_login", handleGoogleLogin)
 }
