@@ -18,6 +18,11 @@ type User struct {
 	LastLoggedIn    int64
 }
 
+type Claims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
 type LoginResp struct {
 	Authenticated bool
 	Token         string

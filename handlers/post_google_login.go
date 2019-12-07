@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/moneybin/moneybin-paz/dto"
 	"github.com/moneybin/moneybin-paz/models"
@@ -12,7 +13,6 @@ import (
 func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 
 	SetupCORSResponse(&w, req)
-
 	if (*req).Method == "OPTIONS" {
 		return
 	}
@@ -83,6 +83,12 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "token",
+		Value:   LoginResp.Token,
+		Expires: time.Now().Add(30 * time.Minute),
+	})
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(resp)

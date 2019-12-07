@@ -30,27 +30,63 @@ func GenerateJWT(u dto.User) (string, error) {
 }
 
 //Authorised checks whether a JWT is valid
-func Authorised(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
+func AuthorisedEndpoint(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
 	signingKey := []byte("havealookatbath")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("error")
-				}
-				return signingKey, nil
-			})
-			if err != nil {
+		// (BEGIN) The code uptil this point is the same as the first part of the `Welcome` route
+		c, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(""))
+				return
 			}
-			if token.Valid {
-				endpoint(w, r)
-			}
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(""))
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
+		tknStr := c.Value
+
+		tokenIsValid, claims, err := IsValidJWT(tknStr)
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if !tokenIsValid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		// (END) The code up-till this point is the same as the first part of the `Welcome` route
+
+		// We ensure that a new token is not issued until enough time has elapsed
+		// In this case, a new token will only be issued if the old token is within
+		// 30 seconds of expiry. Otherwise, return a bad request status
+		if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// Now, create a new token for the current use, with a renewed expiration time
+		expirationTime := time.Now().Add(5 * time.Minute)
+		claims.ExpiresAt = expirationTime.Unix()
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenString, err := token.SignedString(signingKey)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Set the new token as the users `token` cookie
+		http.SetCookie(w, &http.Cookie{
+			Name:    "token",
+			Value:   tokenString,
+			Expires: expirationTime,
+		})
+
+		// If authorised, forward the request to the endpoint
+		endpoint(w, r)
 	})
 }
 
@@ -84,7 +120,24 @@ func GoogleTokenIsValid(token string) error {
 
 func SetupCORSResponse(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Content-Type", "application/json")
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Controjwtokenl-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
+func IsValidJWT(jwtoken string) (bool, *dto.Claims, error) {
+	claims := &dto.Claims{}
+
+	// TODO: get this from the right place
+	signingKey := []byte("havealookatbath")
+	tkn, err := jwt.ParseWithClaims(jwtoken, claims, func(token *jwt.Token) (interface{}, error) {
+		return signingKey, nil
+	})
+	if err != nil {
+		return false, claims, err
+	}
+	if !tkn.Valid {
+		return false, claims, nil
+	}
+	return true, claims, nil
 }
