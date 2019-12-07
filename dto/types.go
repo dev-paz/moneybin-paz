@@ -16,6 +16,7 @@ type User struct {
 	UserName        string
 	SignUpTimestamp int64
 	LastLoggedIn    int64
+	RefreshToken    string
 }
 
 type Claims struct {
@@ -25,7 +26,8 @@ type Claims struct {
 
 type LoginResp struct {
 	Authenticated bool
-	Token         string
+	AccessToken   string
+	RefreshToken  string
 }
 
 type LoginReq struct {

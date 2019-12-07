@@ -38,15 +38,20 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 	// fetch google profile info for user
 	googleUser, err := GetGoogleUser(createUserReq.Token)
 	if err != nil {
-		fmt.Println("Error fetching google profiledytrsj")
+		fmt.Println("Error fetching google profile")
 		return
 	}
 	// check if user already exists and sign in if so
 	_, err = models.ReadUser(googleUser.Sub)
 	if err == nil {
-		LoginResp.Token, err = GenerateJWT(user)
+		LoginResp.AccessToken, err = GenerateJWT(user)
 		if err != nil {
-			fmt.Println("Error generating token")
+			fmt.Println("Error generating access token")
+			return
+		}
+		LoginResp.RefreshToken, err = GenerateJWT(user)
+		if err != nil {
+			fmt.Println("Error generating refresh token")
 			return
 		}
 		LoginResp.Authenticated = true
@@ -54,10 +59,8 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-
 		w.WriteHeader(http.StatusOK)
 		w.Write(resp)
-
 		return
 	}
 	// if no user is found, make a new one
@@ -72,12 +75,17 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	LoginResp.Token, err = GenerateJWT(user)
+	LoginResp.AccessToken, err = GenerateJWT(user)
 	if err != nil {
-		fmt.Println("Error generating token")
+		fmt.Println("Error generating access token")
 		return
 	}
 
+	LoginResp.RefreshToken, err = GenerateJWT(user)
+	if err != nil {
+		fmt.Println("Error generating refresh token")
+		return
+	}
 	LoginResp.Authenticated = true
 	resp, err := json.Marshal(&LoginResp)
 	if err != nil {
@@ -86,7 +94,7 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
-		Value:   LoginResp.Token,
+		Value:   LoginResp.AccessToken,
 		Expires: time.Now().Add(30 * time.Minute),
 	})
 
