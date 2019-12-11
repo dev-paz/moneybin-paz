@@ -25,7 +25,7 @@ func handleGetPaymentIntent(w http.ResponseWriter, req *http.Request) {
 
 	params := &stripe.PaymentIntentParams{
 		Amount:   &a,
-		Currency: stripe.String(string(stripe.CurrencyGBP)),
+		Currency: stripe.String(string(striresppe.CurrencyGBP)),
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
 		}),
