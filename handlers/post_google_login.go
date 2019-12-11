@@ -43,6 +43,7 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 	// check if user already exists and sign in if so
 	_, err = models.ReadUser(googleUser.Sub)
 	if err == nil {
+		user.UserID = googleUser.Sub
 		err = loginUser(user, w)
 		if err != nil {
 			fmt.Println(err.Error())
