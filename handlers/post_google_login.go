@@ -18,7 +18,6 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 	}
 
 	createUserReq := dto.CreateUserReq{}
-	LoginResp := dto.LoginResp{}
 	user := dto.User{}
 
 	decoder := json.NewDecoder(req.Body)
@@ -44,23 +43,8 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 	// check if user already exists and sign in if so
 	_, err = models.ReadUser(googleUser.Sub)
 	if err == nil {
-		LoginResp.AccessToken, err = GenerateJWT(user)
-		if err != nil {
-			fmt.Println("Error generating access token")
-			return
-		}
-		LoginResp.RefreshToken, err = GenerateJWT(user)
-		if err != nil {
-			fmt.Println("Error generating refresh token")
-			return
-		}
-		LoginResp.Authenticated = true
-		resp, err := json.Marshal(&LoginResp)
-		if err != nil {
-			panic(err)
-		}
+		loginUser(user, w)
 		w.WriteHeader(http.StatusOK)
-		w.Write(resp)
 		return
 	}
 	// if no user is found, make a new one
@@ -75,29 +59,43 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	LoginResp.AccessToken, err = GenerateJWT(user)
+	loginUser(user, w)
+	w.WriteHeader(http.StatusOK)
+}
+
+// loginUser generates tokens, stores the refresh token and sets the http cookies
+func loginUser(user dto.User, w http.ResponseWriter) {
+	acessToken, err := GenerateJWT(user)
 	if err != nil {
 		fmt.Println("Error generating access token")
 		return
 	}
 
-	LoginResp.RefreshToken, err = GenerateJWT(user)
+	refreshToken, err := GenerateJWT(user)
 	if err != nil {
 		fmt.Println("Error generating refresh token")
 		return
 	}
-	LoginResp.Authenticated = true
-	resp, err := json.Marshal(&LoginResp)
+
+	us := dto.UserSession{
+		RefreshToken: refreshToken,
+		UserID:       user.UserID,
+	}
+	err = models.CreateUserSession(&us)
 	if err != nil {
-		panic(err)
+		fmt.Println("error creating user session")
+		return
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token",
-		Value:   LoginResp.AccessToken,
+		Name:    "access_token",
+		Value:   acessToken,
 		Expires: time.Now().Add(30 * time.Minute),
 	})
 
-	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	http.SetCookie(w, &http.Cookie{
+		Name:    "refresh_token",
+		Value:   refreshToken,
+		Expires: time.Now().Add(72 * time.Hour),
+	})
 }

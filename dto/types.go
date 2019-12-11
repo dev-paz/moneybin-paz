@@ -16,7 +16,11 @@ type User struct {
 	UserName        string
 	SignUpTimestamp int64
 	LastLoggedIn    int64
-	RefreshToken    string
+}
+
+type UserSession struct {
+	UserID       string
+	RefreshToken string
 }
 
 type Claims struct {

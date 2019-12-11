@@ -58,7 +58,6 @@ func AuthorisedEndpoint(endpoint func(http.ResponseWriter, *http.Request)) http.
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		// (END) The code up-till this point is the same as the first part of the `Welcome` route
 
 		// We ensure that a new token is not issued until enough time has elapsed
 		// In this case, a new token will only be issued if the old token is within
@@ -127,7 +126,6 @@ func SetupCORSResponse(w *http.ResponseWriter, req *http.Request) {
 
 func IsValidJWT(jwtoken string) (bool, *dto.Claims, error) {
 	claims := &dto.Claims{}
-
 	// TODO: get this from the right place
 	signingKey := []byte("havealookatbath")
 	tkn, err := jwt.ParseWithClaims(jwtoken, claims, func(token *jwt.Token) (interface{}, error) {
