@@ -12,6 +12,7 @@ func CreateUserSession(us *dto.UserSession) error {
 	VALUES ($1, $2)
 	RETURNING user_id`
 	id := ""
+	fmt.Println(us)
 	err := db.QueryRow(sqlStatement, us.UserID, us.RefreshToken).Scan(&id)
 	if err != nil {
 		fmt.Printf(err.Error())
