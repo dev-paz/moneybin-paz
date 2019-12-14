@@ -24,6 +24,7 @@ func authorisedEndpoint(endpoint func(http.ResponseWriter, *http.Request)) http.
 		c, err := r.Cookie("access_token")
 		if err != nil {
 			if err == http.ErrNoCookie {
+				fmt.Println("no cookie")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
