@@ -28,6 +28,7 @@ func authorisedEndpoint(endpoint func(http.ResponseWriter, *http.Request)) http.
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
+			fmt.Println("bad req")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
