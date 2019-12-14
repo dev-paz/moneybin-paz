@@ -24,7 +24,8 @@ type UserSession struct {
 }
 
 type Claims struct {
-	Username string `json:"username"`
+	UserID      string `json:"user_id"`
+	TokenExpiry int64  `json:"exp"`
 	jwt.StandardClaims
 }
 

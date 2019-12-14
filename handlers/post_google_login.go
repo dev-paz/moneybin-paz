@@ -74,13 +74,13 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 
 // loginUser generates tokens, stores the refresh token and sets the http cookies
 func loginUser(user dto.User, w http.ResponseWriter) error {
-	acessToken, err := GenerateJWT(user)
+	acessToken, err := GenerateJWT(user.UserID)
 	if err != nil {
 		fmt.Println("Error generating access token")
 		return err
 	}
 
-	refreshToken, err := GenerateJWT(user)
+	refreshToken, err := GenerateJWT(user.UserID)
 	if err != nil {
 		fmt.Println("Error generating refresh token")
 		return err
