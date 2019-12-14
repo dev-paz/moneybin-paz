@@ -11,8 +11,6 @@ import (
 )
 
 func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
-
-	SetupCORSResponse(&w, req)
 	if (*req).Method == "OPTIONS" {
 		return
 	}
@@ -49,6 +47,8 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 			fmt.Println(err.Error())
 			return
 		}
+
+		SetupCORSResponse(&w, req)
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -76,6 +76,7 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 		Expires: time.Now().Add(30 * time.Minute),
 	})
 
+	SetupCORSResponse(&w, req)
 	w.WriteHeader(http.StatusOK)
 }
 
