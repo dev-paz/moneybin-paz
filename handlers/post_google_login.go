@@ -47,7 +47,6 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 			fmt.Println(err.Error())
 			return
 		}
-
 		SetupCORSResponse(&w, req)
 		w.WriteHeader(http.StatusOK)
 		return
