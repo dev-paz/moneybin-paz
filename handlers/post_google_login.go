@@ -44,7 +44,7 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 	_, err = models.ReadUser(googleUser.Sub)
 	if err == nil {
 		user.UserID = googleUser.Sub
-		err = loginUser(user, w)
+		err = loginUser(user, &w)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
@@ -64,7 +64,7 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	err = loginUser(user, w)
+	err = loginUser(user, &w)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -73,7 +73,7 @@ func handleGoogleLogin(w http.ResponseWriter, req *http.Request) {
 }
 
 // loginUser generates tokens, stores the refresh token and sets the http cookies
-func loginUser(user dto.User, w http.ResponseWriter) error {
+func loginUser(user dto.User, w *http.ResponseWriter) error {
 	acessToken, err := GenerateJWT(user.UserID)
 	if err != nil {
 		fmt.Println("Error generating access token")
@@ -96,13 +96,13 @@ func loginUser(user dto.User, w http.ResponseWriter) error {
 		return err
 	}
 
-	http.SetCookie(w, &http.Cookie{
+	http.SetCookie(*w, &http.Cookie{
 		Name:    "access_token",
 		Value:   acessToken,
 		Expires: time.Now().Add(30 * time.Minute),
 	})
 
-	http.SetCookie(w, &http.Cookie{
+	http.SetCookie(*w, &http.Cookie{
 		Name:    "refresh_token",
 		Value:   refreshToken,
 		Expires: time.Now().Add(72 * time.Hour),
